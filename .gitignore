@@ -1,0 +1,18 @@
+# 가상환경
+venv/
+.venv/
+
+# 환경 변수 (API 키 포함)
+.env
+
+# 파이썬 캐시
+__pycache__/
+*.py[cod]
+
+# 로컬 DB 및 임시 파일
+chroma_db/
+temp.pdf
+.DS_Store
+
+# 데이터 (대용량 PDF는 업로드 비권장)
+data/*.pdf
