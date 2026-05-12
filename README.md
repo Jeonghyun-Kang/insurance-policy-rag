@@ -1,6 +1,5 @@
-# 🛡️ Insurance-Policy-RAG: 보험 약관 근거 기반 응답 시스템
+# 🛡️ 보험 약관 기반 챗봇
 
-> **삼성화재 AI Engineer 지원 토이 프로젝트**
 > 보험 약관 PDF를 분석하여 질문에 대한 정확한 답변과 함께 **근거 조항 및 페이지**를 제시하는 신뢰형 RAG 시스템입니다.
 
 ---
@@ -25,6 +24,7 @@
 ---
 
 ## 3. 🛠️ 핵심 기술 스택 (Tech Stack)
+
 - **Framework**: LangChain (v0.3)
 - **LLM**: Ollama / Llama 3.1 (Local Security Focus)
 - **Embedding**: HuggingFace `intfloat/multilingual-e5-small`
@@ -34,7 +34,7 @@
 
 ---
 
-## 4. 🚀 핵심 차별화 포인트 (Key Differentiators)
+## 4. 🚀 핵심 차별화 포인트 (Key Differentiation)
 
 ### ✅ 금융 도메인 맞춤형 PDF 전처리
 보험 약관은 표(Table)에 핵심 보장 내용이 담겨 있는 경우가 많습니다. 본 프로젝트는 `PyPDF` 대신 표 인식률이 높고 속도가 빠른 **PyMuPDF**를 채택하여 데이터 누락을 최소화했습니다.
