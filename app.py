@@ -16,7 +16,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("보험 약관 PDF를 업로드하세요", type="pdf")
     
     st.header("2. 검색 옵션")
-    search_mode = st.selectbox("리트리버 방식", ["similarity", "mmr"])
+    search_mode = st.selectbox("Retrieval 방식을 선택하세요", ["similarity", "mmr"])
     st.info("MMR은 중복된 정보가 많은 약관에서 더 다양한 조항을 검색합니다.")
 
 # 2. RAG 엔진 초기화
@@ -34,13 +34,16 @@ if uploaded_file and "vector_store" not in st.session_state:
 if "vector_store" in st.session_state:
     chain = get_rag_chain(st.session_state.vector_store, search_mode)
     
-    if prompt := st.chat_input("보험금 청구는 어떻게 하나요?"):
+    if prompt := st.chat_input("질문을 입력해 주세요."):
         st.chat_message("user").markdown(prompt)
         
         with st.chat_message("assistant"):
-            result = chain.invoke({"query": prompt})
-            answer = result["result"]
-            source_docs = result["source_documents"]
+            # 1. 체인 실행 (결과를 result 변수에 담습니다)
+            result = chain.invoke({"input": prompt})
+
+            # 2. 결과에서 답변(answer)과 근거(context)를 꺼냅니다
+            answer = result["answer"]
+            source_docs = result["context"]
             
             st.markdown(answer)
             
@@ -51,7 +54,7 @@ if "vector_store" in st.session_state:
                     content = doc.page_content[:200]
                     st.write(f"**Page {page}**: ...{content}...")
 else:
-    st.warning("먼저 왼쪽 사이드바에서 약관 PDF를 업로드해 주세요.")
+    st.warning("먼저 보험 약관 PDF를 업로드해 주세요.")
 # import os
 # import shutil
 # import streamlit as st
