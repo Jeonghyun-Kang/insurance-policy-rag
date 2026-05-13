@@ -2,7 +2,7 @@ import streamlit as st
 from dotenv import load_dotenv
 from src.load_pdf import process_insurance_pdf
 from src.build_vector_db import create_vector_db
-from src.rag_chain import get_rag_chain
+# from src.rag_chain import get_rag_chain
 import os
 
 load_dotenv()
@@ -32,29 +32,88 @@ if uploaded_file and "vector_store" not in st.session_state:
 
 # 3. 채팅 인터페이스
 if "vector_store" in st.session_state:
-    chain = get_rag_chain(st.session_state.vector_store, search_mode)
     
     if prompt := st.chat_input("질문을 입력해 주세요."):
         st.chat_message("user").markdown(prompt)
         
         with st.chat_message("assistant"):
-            # 1. 체인 실행 (결과를 result 변수에 담습니다)
-            result = chain.invoke({"input": prompt})
+            # 1. Retrieval 방식 설정
+            if search_mode == "mmr":
+                retriever = st.session_state.vector_store.as_retriever(
+                    search_type="mmr",
+                    search_kwargs={
+                        "k": 5,
+                        "fetch_k": 10,
+                        "lambda_mult": 0.5,
+                    },
+                )
+            else:
+                retriever = st.session_state.vector_store.as_retriever(
+                    search_kwargs={"k": 5}
+                )
 
-            # 2. 결과에서 답변(answer)과 근거(context)를 꺼냅니다
-            answer = result["answer"]
-            source_docs = result["context"]
-            
+            # 2. 관련 약관 조항 검색
+            source_docs = retriever.invoke(prompt)
+
+            # 3. 검색 결과 기반 답변 생성
+            if source_docs:
+                top_doc = source_docs[0]
+                page = top_doc.metadata.get("page", 0) + 1
+
+                answer = f"""
+**관련 조항 요약**
+
+{top_doc.page_content[:10000]}
+"""
+            else:
+                answer = "관련 약관 조항을 찾지 못했습니다."
+
+            # 4. 답변 출력
             st.markdown(answer)
             
-            # 근거(Source) 표시
+            # 5. 근거(Source) 표시
             with st.expander("📍 근거 확인하기"):
-                for doc in source_docs:
-                    page = doc.metadata.get("page", 0) + 1
-                    content = doc.page_content[:200]
-                    st.write(f"**Page {page}**: ...{content}...")
+                if source_docs:
+                    for i, doc in enumerate(source_docs, start=1):
+                        page = doc.metadata.get("page", 0) + 1
+                        source = doc.metadata.get("source", "unknown")
+                        content = doc.page_content[:1000]
+
+                        st.write(f"### 근거 {i}")
+                        st.write(f"**Source:** {source}")
+                        st.write(f"**Page:** {page}")
+                        st.write(content)
+                        st.divider()
+                else:
+                    st.write("검색된 근거 문서가 없습니다.")
 else:
     st.warning("먼저 보험 약관 PDF를 업로드해 주세요.")
+
+# # 3. 채팅 인터페이스
+# if "vector_store" in st.session_state:
+#     # chain = get_rag_chain(st.session_state.vector_store, search_mode)
+    
+#     if prompt := st.chat_input("질문을 입력해 주세요."):
+#         st.chat_message("user").markdown(prompt)
+        
+#         with st.chat_message("assistant"):
+#             # 1. 체인 실행 (결과를 result 변수에 담습니다)
+#             result = chain.invoke({"input": prompt})
+
+#             # 2. 결과에서 답변(answer)과 근거(context)를 꺼냅니다
+#             answer = result["answer"]
+#             source_docs = result["context"]
+            
+#             st.markdown(answer)
+            
+#             # 근거(Source) 표시
+#             with st.expander("📍 근거 확인하기"):
+#                 for doc in source_docs:
+#                     page = doc.metadata.get("page", 0) + 1
+#                     content = doc.page_content[:200]
+#                     st.write(f"**Page {page}**: ...{content}...")
+# else:
+#     st.warning("먼저 보험 약관 PDF를 업로드해 주세요.")
 # import os
 # import shutil
 # import streamlit as st

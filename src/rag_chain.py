@@ -2,7 +2,7 @@ import os
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains import create_retrieval_chain
+# from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
 def get_rag_chain(vector_store, search_type="similarity"):
