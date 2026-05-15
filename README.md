@@ -79,6 +79,7 @@ ollama run llama3.1
 
 # 4. 앱 실행
 streamlit run app.py
+```
 
 ---
 
