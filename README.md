@@ -83,10 +83,10 @@ streamlit run app.py
 
 ---
 
-## 7. 📡 배포 버전 (Deployment Vers.)
+## 7. 📡 환경 및 버전 관리 (Setup)
 
 ### Local Version
 로컬 환경에서는 Ollama / Llama 3.1을 연동하여 검색된 약관 context를 기반으로 자연어 답변을 생성하는 RAG 구조를 구현했습니다.
 
-### Streamlit Cloud Demo Version
+### Deployment Version
 Streamlit Cloud 배포 환경에서는 Ollama 서버 실행이 제한되므로, LLM 답변 생성 대신 검색된 약관 조항과 source/page 근거를 반환하는 retrieval-based Q&A demo로 구성했습니다.
